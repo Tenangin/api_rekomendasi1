@@ -10,9 +10,7 @@ from supabase import create_client, Client
 import os
 from dotenv import load_dotenv
 
-# =====================
-# 🔧 Load ENV
-# =====================
+# Load ENV
 load_dotenv()
 SUPABASE_URL = os.getenv("SUPABASE_URL")
 SUPABASE_KEY = os.getenv("SUPABASE_KEY")
@@ -20,9 +18,7 @@ SUPABASE_KEY = os.getenv("SUPABASE_KEY")
 if not SUPABASE_URL or not SUPABASE_KEY:
     raise ValueError("SUPABASE_URL and SUPABASE_KEY must be set in .env")
 
-# =====================
-# 🌐 Setup FastAPI
-# =====================
+# Setup FastAPI
 app = FastAPI()
 
 # CORS Middleware
@@ -33,27 +29,21 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# =====================
-# 🔌 Supabase Client
-# =====================
+# Supabase Client
 supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 
-# =====================
-# 🔄 Fetch and Preprocess Data
-# =====================
+# Fetch and Preprocess Data
 location_scaler = MinMaxScaler()
 rating_review_scaler = MinMaxScaler()
 
 def fetch_data():
     try:
-        # Cek koneksi & ambil 1 row
         test_response = supabase.table("clinics").select("*").limit(1).execute()
         if test_response.data:
             msg = "Koneksi berhasil, data dari tabel 'clinics' ditemukan."
         else:
             msg = "Koneksi berhasil, tapi data dari tabel 'clinics' kosong."
 
-        # Ambil data lengkap clinics
         response = supabase.table("clinics").select("*").execute()
         data = response.data
         df = pd.DataFrame(data)
@@ -63,7 +53,6 @@ def fetch_data():
         print("Kolom tersedia:", df.columns)
         print("Contoh data:", df.head())
 
-        # Cek daftar tabel di schema public (perbaiki query)
         try:
             res = supabase.postgrest.from_("pg_catalog.pg_tables").select("tablename").eq("schemaname", "public").execute()
             tables = [t['tablename'] for t in res.data]
@@ -90,14 +79,12 @@ def print_connection_info():
         print(f"Gagal koneksi atau fetch data dari 'clinics': {e}")
 
     try:
-        # Cek list tabel di schema public
         res = supabase.postgrest.from_("pg_tables").select("tablename").eq("schemaname", "public").execute()
         tables = [t['tablename'] for t in res.data]
         print("Daftar tabel di schema 'public':", tables)
     except Exception as e:
         print(f"Gagal mendapatkan daftar tabel: {e}")
 
-# Panggil fungsi ini di awal program, misal setelah buat client
 print_connection_info()
 
 
@@ -117,15 +104,12 @@ def preprocess_data(df: pd.DataFrame):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Kesalahan saat preprocessing: {e}")
 
-# =====================
-# 🔍 Endpoint Rekomendasi
-# =====================
+# Endpoint Rekomendasi
 @app.get("/recommend")
 def recommend(lat: float = Query(...), lon: float = Query(...), top_k: int = 5):
     df = fetch_data()
     features = preprocess_data(df)
 
-    # Vektor user
     try:
         avg_rating = df['rating'].max()
         avg_review = df['review_count'].mean()
