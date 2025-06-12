@@ -10,7 +10,6 @@ Proyek ini menyediakan API rekomendasi untuk klinik psikologi di Indonesia. API 
 - [Pengaturan Lingkungan (.env)](#pengaturan-lingkungan-env)
 - [Instalasi dan Penggunaan](#instalasi-dan-penggunaan)
 - [Endpoints API](#endpoints-api)
-- [Struktur Proyek](#struktur-proyek)
 - [Dependensi](#dependensi)
 
 ## Gambaran Umum Proyek
@@ -154,15 +153,6 @@ GET [http://127.0.0.1:8000/recommend?lat=-6.2088\&lon=106.8456\&top\_k=3](https:
 ]
 ````
 
-## Struktur Proyek
-
-```
-.
-├── main.py             # Kode utama aplikasi FastAPI dan logika rekomendasi.
-├── requirements.txt    # Daftar dependensi Python.
-├── .env                # File untuk variabel lingkungan (SUPABASE_URL, SUPABASE_KEY).
-└── README.md           # File ini.
-```
 
 ## Dependensi
 
